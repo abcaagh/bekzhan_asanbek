@@ -14,13 +14,15 @@ num_translations = {
 
 
 def num_translate(num):
+    translation = ''
     for en, ru in num_translations.items():
         if (en == num):
             return num_translations.get(num)
         elif (ru == num):
             return en
         else:
-            return 'None'
+            translation = 'None'
+    return translation
 
 
-print(num_translate('s'))
+print(num_translate('two'))
