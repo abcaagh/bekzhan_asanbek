@@ -1,32 +1,14 @@
-from bs4 import BeautifulSoup
+import json
+import xml.etree.ElementTree as ET
+
 from requests import get
 
+url = 'http://www.cbr.ru/scripts/XML_daily.asp'
+headers = {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.82 Safari/537.36"
+}
 
-def currency_rates(val):
-    response = get('http://cbr.ru/scripts/XML_daily.asp')
-    src = response.text
-    soup = BeautifulSoup(src, "lxml")
-    currency = []
-
-    num_code = soup.find_all("numcode")
-    char_code = soup.find_all("charcode")
-    name = soup.find_all("name")
-    value = soup.find_all("value")
-
-    i = 0
-    while i < len(name):
-        currency.append({
-            "name": name[i].text,
-            "char_code": char_code[i].text,
-            "value": value[i].text,
-            "num_code": num_code[i].text,
-        })
-        i += 1
-    for item in range(len(currency)):
-        if currency[item]['char_code'] == val:
-            return currency[item]['value']
-        else:
-            print("None")
-
-
-print(f'{currency_rates("AUD")}')
+response = get(url, headers=headers)
+tree = ET.ElementTree(ET.fromstring(response.text)).getroot()
+print(tree)
