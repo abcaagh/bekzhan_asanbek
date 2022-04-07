@@ -1,14 +1,25 @@
-import json
-import xml.etree.ElementTree as ET
-
 from requests import get
 
 url = 'http://www.cbr.ru/scripts/XML_daily.asp'
-headers = {
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.82 Safari/537.36"
-}
+resp = get(url)
+src = resp.text
+valuta_list = []
 
-response = get(url, headers=headers)
-tree = ET.ElementTree(ET.fromstring(response.text)).getroot()
-print(tree)
+for _ in range(len(src)):
+    start_index = src.find('<Valute ID')
+    last_index = src.find('</Valute>') + 9
+    if start_index == -1:
+        break
+    valuta_list.append(src[start_index:last_index])
+    src = src[last_index:]
+
+
+def currency_rates(val):
+    for el in valuta_list:
+        if el.find(val.upper()) != -1:
+            value = el[el.find('Value') + 6:el.rfind('Value') - 2]
+            return float(value.replace(',', '.'))
+    return None
+
+print(f'1 рубль равен {currency_rates("USD")} доллару')
+print(f"1 рубль равен {currency_rates('EUR')} евро")
